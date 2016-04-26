@@ -1,0 +1,36 @@
+FROM debian:jessie
+
+RUN apt-get update -o Acquire::ForceIPv4=true && apt-get install -o Acquire::ForceIPv4=true -y libcairo2-dev \
+libjpeg62-turbo-dev \
+libpng12-dev \
+libossp-uuid-dev \
+libfreerdp-dev \
+libpango1.0-dev \
+libssh2-1-dev \
+libtelnet-dev \
+libvncserver-dev \
+libssl-dev \
+libvorbis-dev \
+libwebp-dev
+
+RUN mkdir /guac-sources
+
+ADD guacamole-server-0.9.9.tar.gz /guac-sources/
+
+#WORKDIR /guac-sources
+
+#RUN tar -xzf guacamole-server-0.9.9.tar.gz
+
+WORKDIR /guac-sources/guacamole-server-0.9.9
+
+RUN ./configure
+
+RUN make
+
+RUN make install
+
+RUN ldconfig
+
+EXPOSE 4822
+
+ENTRYPOINT ["/usr/local/sbin/guacd", "-p", "/var/run/guacd.pid", "-f"]
